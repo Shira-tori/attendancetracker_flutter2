@@ -18,7 +18,20 @@ class HomeScreen extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: const Color(0xFF416E8E),
-            title: const Text("Attendify"),
+            title: Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                  height: 70,
+                  width: 200,
+                  child: Wrap(children: const [
+                    Image(
+                      image: AssetImage(
+                        'images/attendify.png',
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ])),
+            ),
             titleTextStyle:
                 const TextStyle(fontSize: 25, fontFamily: "Muli-Bold"),
             bottom: TabBar(
@@ -126,6 +139,7 @@ class HomeScreen extends StatelessWidget {
                         onTap: () {
                           context.read<ScannerProvider>().reset();
                           context.read<LoginProvider>().setButtonChildNormal();
+                          context.read<LoginProvider>().setFailedFalse();
                           Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class LoginProvider extends ChangeNotifier {
-  bool _disabled = false;
   bool _showPassword = true;
   // ignore: prefer_final_fields
   Widget _buttonChild = const Text(
     "Login",
     style: TextStyle(color: Color(0xFF1C4274), fontFamily: "Muli-Bold"),
   );
+  bool _failed = false;
 
   bool get showPassword => _showPassword;
   Widget get buttonChild => _buttonChild;
-  bool get disabled => disabled;
+  bool get failed => _failed;
 
   void showsPassword() {
     if (_showPassword == true) {
@@ -22,8 +22,13 @@ class LoginProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDisabled() {
-    _disabled = true;
+  void setFailed() {
+    _failed = true;
+    notifyListeners();
+  }
+
+  void setFailedFalse() {
+    _failed = false;
     notifyListeners();
   }
 

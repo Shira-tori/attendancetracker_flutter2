@@ -132,45 +132,64 @@ class LoginScreen extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () async {
-                                context.read<LoginProvider>().setDisabled();
                                 context.read<LoginProvider>().setButtonChild();
-                                MySqlConnection db =
-                                    await MySqlConnection.connect(
-                                        ConnectionSettings(
-                                            host: 'sql6.freemysqlhosting.net',
-                                            user: 'sql6588996',
-                                            db: 'sql6588996',
-                                            password: 'S9DPyTQx87'));
-                                var result = await db.query(
-                                    'SELECT fullname, username, password, role_id, users_tbl.user_id, flutter_teachers_tbl.teacher_id FROM users_tbl INNER JOIN flutter_teachers_tbl ON flutter_teachers_tbl.user_id = users_tbl.user_id WHERE username = "${usernameController.text}" AND password = "${passwordController.text}"');
-                                if (result.isNotEmpty) {
-                                  for (var row in result) {
+                                try {
+                                  MySqlConnection db =
+                                      await MySqlConnection.connect(
+                                          ConnectionSettings(
+                                              host: 'sql6.freemysqlhosting.net',
+                                              user: 'sql6588996',
+                                              db: 'sql6588996',
+                                              password: 'S9DPyTQx87'));
+                                  var result = await db.query(
+                                      'SELECT fullname, username, password, role_id, users_tbl.user_id, flutter_teachers_tbl.teacher_id FROM users_tbl INNER JOIN flutter_teachers_tbl ON flutter_teachers_tbl.user_id = users_tbl.user_id WHERE username = "${usernameController.text}" AND password = "${passwordController.text}"');
+                                  if (result.isNotEmpty) {
+                                    for (var row in result) {
+                                      context
+                                          .read<ScannerProvider>()
+                                          .setTeacherId(row[5]);
+                                      context
+                                          .read<ScannerProvider>()
+                                          .setAbsentees();
+                                      context
+                                          .read<ScannerProvider>()
+                                          .setUser(row[0]);
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                const HomeScreen(),
+                                          ),
+                                          (route) => false);
+                                    }
+                                  } else {
+                                    context.read<LoginProvider>().setFailed();
                                     context
-                                        .read<ScannerProvider>()
-                                        .setTeacherId(row[5]);
-                                    context
-                                        .read<ScannerProvider>()
-                                        .setAbsentees();
-                                    context
-                                        .read<ScannerProvider>()
-                                        .setUser(row[0]);
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              const HomeScreen(),
-                                        ),
-                                        (route) => false);
+                                        .read<LoginProvider>()
+                                        .setButtonChildNormal();
                                   }
+
+                                  db.close();
+                                } catch (e) {
+                                  context.read<LoginProvider>().setFailed();
+                                  context
+                                      .read<LoginProvider>()
+                                      .setButtonChildNormal();
                                 }
-                                db.close();
                               },
                               child: context.watch<LoginProvider>().buttonChild,
                             ),
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    context.watch<LoginProvider>().failed == true
+                        ? const Text(
+                            "An error has occured. Check your internet connection",
+                            style: TextStyle(
+                                color: Colors.red, fontFamily: "Muli-Bold"),
+                          )
+                        : const SizedBox.shrink(),
                   ],
                 ),
               ),

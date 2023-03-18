@@ -41,47 +41,78 @@ class _ScannerTabState extends State<ScannerTab> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
+    late String lastScanned = "";
     setState(() {
       this.controller = controller;
     });
     controller.scannedDataStream.listen(
       (data) {
-        setState(
-          () {
-            context.read<ScannerProvider>().setData(data);
-            if (data.code!.split(':')[2] == 'SECRET_KEY') {
-              if (context.read<ScannerProvider>().teacherid.toString() ==
-                  data.code!.split(':')[1]) {
-                if (context
-                    .read<ScannerProvider>()
-                    .namesOfStudent
-                    .contains(data.code!.split(':')[0])) {
-                  return;
+        setState(() {
+          context.read<ScannerProvider>().setData(data);
+          if (lastScanned != data.code) {
+            try {
+              if (data.code!.split(':')[2] == 'SECRET_KEY') {
+                if (context.read<ScannerProvider>().teacherid.toString() ==
+                    data.code!.split(':')[1]) {
+                  if (context
+                      .read<ScannerProvider>()
+                      .namesOfStudent
+                      .contains(data.code!.split(':')[0])) {
+                    lastScanned = data.code!;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("This QR code has been scanned."),
+                        duration: Duration(milliseconds: 500),
+                      ),
+                    );
+                    return;
+                  }
+                  String minute = DateTime.now().minute < 10
+                      ? "0${DateTime.now().minute}"
+                      : DateTime.now().minute.toString();
+                  context
+                      .read<ScannerProvider>()
+                      .namesOfStudent
+                      .add(data.code!.split(':')[0]);
+                  context
+                      .read<ScannerProvider>()
+                      .timeOfScan
+                      .add("${DateTime.now().hour}:$minute");
+                  context
+                      .read<ScannerProvider>()
+                      .absentees
+                      .remove(data.code!.split(':')[0]);
+                  lastScanned = data.code!;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Scanned Successfully"),
+                      duration: Duration(milliseconds: 500),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Invalid QR Code."),
+                    ),
+                  );
                 }
-                String minute = DateTime.now().minute < 10
-                    ? "0${DateTime.now().minute}"
-                    : DateTime.now().minute.toString();
-                context
-                    .read<ScannerProvider>()
-                    .namesOfStudent
-                    .add(data.code!.split(':')[0]);
-                context
-                    .read<ScannerProvider>()
-                    .timeOfScan
-                    .add("${DateTime.now().hour}:$minute");
-                context
-                    .read<ScannerProvider>()
-                    .absentees
-                    .remove(data.code!.split(':')[0]);
+              } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text("Scanned Successfully"),
+                    content: Text("Invalid QR Code."),
                   ),
                 );
               }
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Invalid QR Code."),
+                ),
+              );
             }
-          },
-        );
+          }
+          
+        });
       },
     );
   }

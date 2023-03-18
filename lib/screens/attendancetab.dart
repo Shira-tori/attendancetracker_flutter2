@@ -225,17 +225,23 @@ class AttendanceTab extends StatelessWidget {
                                               io.Directory? path =
                                                   await getExternalStorageDirectory();
                                               if (io.File(
-                                                      '${path!.path}/${months[DateTime.now().month - 1]}')
+                                                      '${path!.path}/${months[DateTime.now().month - 1]}.xlsx')
                                                   .existsSync()) {
-                                                Excel excel =
-                                                    Excel.createExcel();
+                                                Excel excel = Excel.decodeBytes(
+                                                    io.File('${path.path}/${months[DateTime.now().month - 1]}.xlsx')
+                                                        .readAsBytesSync());
+                                                if (excel.sheets.containsValue(
+                                                    '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}')) {
+                                                  excel.delete(
+                                                      '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}');
+                                                }
                                                 Sheet sheet = excel[
                                                     '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}'];
-                                                sheet.merge(
-                                                  CellIndex.indexByString('A1'),
-                                                  CellIndex.indexByString('B1'),
-                                                  customValue: 'PRESENT',
-                                                );
+                                                sheet
+                                                    .cell(
+                                                        CellIndex.indexByString(
+                                                            'A1'))
+                                                    .value = 'PRESENT';
                                                 int i = 2;
                                                 for (var row in context
                                                     .read<ScannerProvider>()
@@ -254,12 +260,66 @@ class AttendanceTab extends StatelessWidget {
                                                       .timeOfScan[i - 2];
                                                   i++;
                                                 }
-                                                sheet.merge(
+                                                sheet
+                                                    .cell(
+                                                      CellIndex.indexByString(
+                                                          'C1'),
+                                                    )
+                                                    .value = 'ABSENT';
+                                                i = 2;
+                                                for (var row in context
+                                                    .read<ScannerProvider>()
+                                                    .absentees) {
+                                                  var cell = sheet.cell(
+                                                      CellIndex.indexByString(
+                                                          'C$i'));
+                                                  cell.value = row;
+                                                  i++;
+                                                }
+                                                var fileBytes = excel.save();
+                                                io.File(
+                                                    '${path.path}/${months[DateTime.now().month - 1]}.xlsx')
+                                                  ..createSync(recursive: true)
+                                                  ..writeAsBytesSync(
+                                                      fileBytes!);
+                                                OpenFile.open(
+                                                    '${path.path}/${months[DateTime.now().month - 1]}.xlsx');
+                                              } else {
+                                                Excel excel =
+                                                    Excel.createExcel();
+                                                excel.rename(
+                                                    excel.getDefaultSheet()!,
+                                                    '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}');
+                                                Sheet sheet = excel[
+                                                    '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}'];
+                                                sheet
+                                                    .cell(
+                                                        CellIndex.indexByString(
+                                                            'A1'))
+                                                    .value = 'PRESENT';
+                                                int i = 2;
+                                                for (var row in context
+                                                    .read<ScannerProvider>()
+                                                    .namesOfStudent) {
+                                                  var cell = sheet.cell(
                                                     CellIndex.indexByString(
-                                                        'C1'),
+                                                        'A$i'),
+                                                  );
+                                                  cell.value = row;
+                                                  var cell2 = sheet.cell(
                                                     CellIndex.indexByString(
-                                                        'D1'),
-                                                    customValue: "ABSENT");
+                                                        'B$i'),
+                                                  );
+                                                  cell2.value = context
+                                                      .read<ScannerProvider>()
+                                                      .timeOfScan[i - 2];
+                                                  i++;
+                                                }
+                                                sheet
+                                                    .cell(
+                                                        CellIndex.indexByString(
+                                                            'C1'))
+                                                    .value = 'ABSENT';
                                                 i = 2;
                                                 for (var row in context
                                                     .read<ScannerProvider>()
@@ -279,56 +339,6 @@ class AttendanceTab extends StatelessWidget {
                                                 OpenFile.open(
                                                     '${path.path}/${months[DateTime.now().month - 1]}.xlsx');
                                               }
-                                              Excel excel = Excel.createExcel();
-                                              excel.rename(
-                                                  excel.getDefaultSheet()!,
-                                                  '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}');
-                                              Sheet sheet = excel[
-                                                  '${DateTime.now().month}-${DateTime.now().day}-${DateTime.now().year}'];
-                                              sheet.merge(
-                                                CellIndex.indexByString('A1'),
-                                                CellIndex.indexByString('B1'),
-                                                customValue: 'PRESENT',
-                                              );
-                                              int i = 2;
-                                              for (var row in context
-                                                  .read<ScannerProvider>()
-                                                  .namesOfStudent) {
-                                                var cell = sheet.cell(
-                                                  CellIndex.indexByString(
-                                                      'A$i'),
-                                                );
-                                                cell.value = row;
-                                                var cell2 = sheet.cell(
-                                                  CellIndex.indexByString(
-                                                      'B$i'),
-                                                );
-                                                cell2.value = context
-                                                    .read<ScannerProvider>()
-                                                    .timeOfScan[i - 2];
-                                                i++;
-                                              }
-                                              sheet.merge(
-                                                  CellIndex.indexByString('C1'),
-                                                  CellIndex.indexByString('D1'),
-                                                  customValue: "ABSENT");
-                                              i = 2;
-                                              for (var row in context
-                                                  .read<ScannerProvider>()
-                                                  .absentees) {
-                                                var cell = sheet.cell(
-                                                    CellIndex.indexByString(
-                                                        'C$i'));
-                                                cell.value = row;
-                                                i++;
-                                              }
-                                              var fileBytes = excel.save();
-                                              io.File(
-                                                  '${path.path}/${months[DateTime.now().month - 1]}.xlsx')
-                                                ..createSync(recursive: true)
-                                                ..writeAsBytesSync(fileBytes!);
-                                              OpenFile.open(
-                                                  '${path.path}/${months[DateTime.now().month - 1]}.xlsx');
                                             },
                                             child: const Text("Yes"),
                                           ),
