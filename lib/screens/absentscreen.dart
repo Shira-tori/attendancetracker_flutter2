@@ -1,4 +1,4 @@
-import 'package:attendancetracker_flutter2/providers/cameratabprovider.dart';
+import 'package:Attendify/providers/cameratabprovider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

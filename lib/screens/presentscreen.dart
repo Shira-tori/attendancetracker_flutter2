@@ -1,4 +1,4 @@
-import 'package:attendancetracker_flutter2/providers/cameratabprovider.dart';
+import 'package:Attendify/providers/cameratabprovider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -36,6 +36,32 @@ class PresentScreen extends StatelessWidget {
                     ),
                     subtitle: Text(
                         "Time: ${context.watch<ScannerProvider>().timeOfScan[index]}"),
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Remove"),
+                            content: const Text("Are you sure?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  context.read<ScannerProvider>().delete(index);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Yes'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('No'),
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    },
                     onTap: () {
                       showDialog(
                         context: context,

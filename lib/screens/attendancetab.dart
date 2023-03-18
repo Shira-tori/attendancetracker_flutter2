@@ -5,8 +5,8 @@ import 'dart:io' as io;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:excel/excel.dart';
-import 'package:attendancetracker_flutter2/providers/cameratabprovider.dart';
-import 'package:attendancetracker_flutter2/screens/presentscreen.dart';
+import 'package:Attendify/providers/cameratabprovider.dart';
+import 'package:Attendify/screens/presentscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

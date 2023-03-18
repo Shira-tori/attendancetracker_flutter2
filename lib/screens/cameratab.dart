@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:attendancetracker_flutter2/providers/cameratabprovider.dart';
+import 'package:Attendify/providers/cameratabprovider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';

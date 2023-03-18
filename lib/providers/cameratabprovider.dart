@@ -64,4 +64,10 @@ class ScannerProvider extends ChangeNotifier {
     _timeOfScan.clear();
     _students.clear();
   }
+
+  void delete(int index) {
+    _absentees.add(_namesOfStudent[index]);
+    _namesOfStudent.removeAt(index);
+    notifyListeners();
+  }
 }

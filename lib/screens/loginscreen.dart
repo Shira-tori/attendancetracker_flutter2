@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:attendancetracker_flutter2/providers/cameratabprovider.dart';
-import 'package:attendancetracker_flutter2/providers/loginprovider.dart';
-import 'package:attendancetracker_flutter2/screens/homescreen.dart';
+import 'package:Attendify/providers/cameratabprovider.dart';
+import 'package:Attendify/providers/loginprovider.dart';
+import 'package:Attendify/screens/homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';

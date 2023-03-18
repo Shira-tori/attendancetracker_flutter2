@@ -1,6 +1,6 @@
-import 'package:attendancetracker_flutter2/providers/cameratabprovider.dart';
-import 'package:attendancetracker_flutter2/providers/loginprovider.dart';
-import 'package:attendancetracker_flutter2/screens/loginscreen.dart';
+import 'package:Attendify/providers/cameratabprovider.dart';
+import 'package:Attendify/providers/loginprovider.dart';
+import 'package:Attendify/screens/loginscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
