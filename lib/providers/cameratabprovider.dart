@@ -31,7 +31,7 @@ class ScannerProvider extends ChangeNotifier {
     _teacherid = teacherId;
   }
 
-  void setAbsentees() async {
+  Future setAbsentees() async {
     ConnectionSettings c = ConnectionSettings(
         host: 'sql6.freemysqlhosting.net',
         user: 'sql6588996',

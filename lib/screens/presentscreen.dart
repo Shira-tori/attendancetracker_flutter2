@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:Attendify/providers/cameratabprovider.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class PresentScreen extends StatelessWidget {
@@ -45,8 +48,37 @@ class PresentScreen extends StatelessWidget {
                             content: const Text("Are you sure?"),
                             actions: [
                               TextButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   context.read<ScannerProvider>().delete(index);
+                                  Directory directory =
+                                      await getApplicationSupportDirectory();
+                                  File file = File(
+                                      '${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt');
+                                  debugPrint(directory.path);
+                                  if (file.existsSync()) {
+                                    for (var i = 0;
+                                        i <=
+                                            context
+                                                    .read<ScannerProvider>()
+                                                    .namesOfStudent
+                                                    .length -
+                                                1;
+                                        i++) {
+                                      print(context
+                                          .read<ScannerProvider>()
+                                          .namesOfStudent[i]);
+                                      if (i == 0) {
+                                        print("$i hello");
+                                        file.writeAsStringSync(
+                                            "${context.read<ScannerProvider>().namesOfStudent[i]}::${context.read<ScannerProvider>().timeOfScan[i]},");
+                                      } else {
+                                        print(i);
+                                        file.writeAsStringSync(
+                                            "${context.read<ScannerProvider>().namesOfStudent[i]}::${context.read<ScannerProvider>().timeOfScan[i]},",
+                                            mode: FileMode.append);
+                                      }
+                                    }
+                                  }
                                   Navigator.pop(context);
                                 },
                                 child: const Text('Yes'),
@@ -86,10 +118,39 @@ class PresentScreen extends StatelessWidget {
                             ),
                             actions: [
                               TextButton(
-                                  onPressed: () {
+                                  onPressed: () async {
                                     context
                                         .read<ScannerProvider>()
                                         .editTime(controller.text, index);
+                                    Directory directory =
+                                        await getApplicationSupportDirectory();
+                                    File file = File(
+                                        '${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt');
+                                    debugPrint(directory.path);
+                                    if (file.existsSync()) {
+                                      for (var i = 0;
+                                          i <=
+                                              context
+                                                      .read<ScannerProvider>()
+                                                      .namesOfStudent
+                                                      .length -
+                                                  1;
+                                          i++) {
+                                        print(context
+                                            .read<ScannerProvider>()
+                                            .namesOfStudent[i]);
+                                        if (i == 0) {
+                                          print("$i hello");
+                                          file.writeAsStringSync(
+                                              "${context.read<ScannerProvider>().namesOfStudent[i]}::${context.read<ScannerProvider>().timeOfScan[i]},");
+                                        } else {
+                                          print(i);
+                                          file.writeAsStringSync(
+                                              "${context.read<ScannerProvider>().namesOfStudent[i]}::${context.read<ScannerProvider>().timeOfScan[i]},",
+                                              mode: FileMode.append);
+                                        }
+                                      }
+                                    }
                                     Navigator.pop(context);
                                   },
                                   child: const Text("Ok")),

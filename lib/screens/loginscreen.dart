@@ -1,10 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:Attendify/providers/cameratabprovider.dart';
 import 'package:Attendify/providers/loginprovider.dart';
 import 'package:Attendify/screens/homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -144,16 +147,44 @@ class LoginScreen extends StatelessWidget {
                                   var result = await db.query(
                                       'SELECT fullname, username, password, role_id, users_tbl.user_id, flutter_teachers_tbl.teacher_id FROM users_tbl INNER JOIN flutter_teachers_tbl ON flutter_teachers_tbl.user_id = users_tbl.user_id WHERE username = "${usernameController.text}" AND password = "${passwordController.text}"');
                                   if (result.isNotEmpty) {
+                                    Directory directory =
+                                        await getApplicationSupportDirectory();
                                     for (var row in result) {
                                       context
                                           .read<ScannerProvider>()
                                           .setTeacherId(row[5]);
-                                      context
+                                      await context
                                           .read<ScannerProvider>()
                                           .setAbsentees();
                                       context
                                           .read<ScannerProvider>()
                                           .setUser(row[0]);
+                                      if (File(
+                                              "${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt")
+                                          .existsSync()) {
+                                        List<String> text = await File(
+                                                "${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt")
+                                            .readAsLines();
+                                        for (var j in text[0].split(',')) {
+                                          try {
+                                            if (j.split('::')[0] == "") {continue;}
+                                            context
+                                                .read<ScannerProvider>()
+                                                .namesOfStudent
+                                                .add(j.split('::')[0]);
+                                            context
+                                                .read<ScannerProvider>()
+                                                .timeOfScan
+                                                .add(j.split('::')[1]);
+                                            context
+                                                .read<ScannerProvider>()
+                                                .absentees
+                                                .remove(j.split('::')[0]);
+                                          } catch (e) {
+                                            continue;
+                                          }
+                                        }
+                                      }
                                       Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(
@@ -171,6 +202,7 @@ class LoginScreen extends StatelessWidget {
 
                                   db.close();
                                 } catch (e) {
+                                  print(e);
                                   context.read<LoginProvider>().setFailed();
                                   context
                                       .read<LoginProvider>()

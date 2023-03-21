@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Attendify/providers/cameratabprovider.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,24 @@ class _ScannerTabState extends State<ScannerTab> {
       controller!.pauseCamera();
     }
     controller!.resumeCamera();
+  }
+
+  void saveState(Barcode data) async {
+    Directory directory = await getApplicationSupportDirectory();
+    if (File(
+            "${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt")
+        .existsSync()) {
+      File file = File(
+          '${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt');
+      file.writeAsString(
+          "${data.code!.split(':')[0]}::${context.read<ScannerProvider>().timeOfScan[context.read<ScannerProvider>().timeOfScan.length - 1]},",
+          mode: FileMode.append);
+    } else {
+      File file = File(
+          '${directory.path}/${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}::${context.read<ScannerProvider>().teacherid}.txt');
+      file.writeAsString(
+          "${data.code!.split(':')[0]}::${context.read<ScannerProvider>().timeOfScan[context.read<ScannerProvider>().timeOfScan.length - 1]},");
+    }
   }
 
   @override
@@ -67,6 +86,7 @@ class _ScannerTabState extends State<ScannerTab> {
                     );
                     return;
                   }
+                  saveState(data);
                   String minute = DateTime.now().minute < 10
                       ? "0${DateTime.now().minute}"
                       : DateTime.now().minute.toString();
@@ -111,7 +131,6 @@ class _ScannerTabState extends State<ScannerTab> {
               );
             }
           }
-          
         });
       },
     );
